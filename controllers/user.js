@@ -26,17 +26,16 @@ const addUser = async(req, res, next) => {
     }
 }
 
-const getUser = async(req, res, next) => {
-    try{
-        const users = await User.findAll();
-        res.status(200).json({allUsers: users});
-    } catch(error){
-        console.log('Get user is failing', JSON.stringify(error));
-        res.status(500).json({error: error});
-    }
-}
+// const getUser = async(req, res, next) => {
+//     try{
+//         const users = await User.findAll();
+//         res.status(200).json({allUsers: users});
+//     } catch(error){
+//         console.log('Get user is failing', JSON.stringify(error));
+//         res.status(500).json({error: error});
+//     }
+// }
 
 module.exports = {
-    addUser,
-    getUser
+    addUser
 }
