@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 const User = require('../models/user');
@@ -29,6 +30,10 @@ const addUser = async (req, res) => {
     }
 }
 
+function generateAccessToken(id){
+    return jwt.sign({userId: id}, 'secretkey');
+}
+
 const loginUser = async (req, res) => {
     try{
         const { email, password } = req.body;
@@ -39,10 +44,10 @@ const loginUser = async (req, res) => {
         if(user.length > 0){
             bcrypt.compare(password, user[0].password, (err, result) => {
                 if(err){
-                    res.status(500).json({success: false, message: "Something went wrong"})
+                    return res.status(500).json({success: false, message: "Something went wrong"})
                 }
                 if(result === true){
-                    res.status(200).json({success: true, message: "User logged in successfully"})
+                    return res.status(200).json({success: true, message: "User logged in successfully", token: generateAccessToken(user[0].id)})
                 } else {
                     return res.status(400).json({success: false, message: "Password is incorrect"})
                 }

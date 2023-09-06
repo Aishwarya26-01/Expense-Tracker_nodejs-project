@@ -6,8 +6,9 @@ const registerExpense = async(event) => {
         expenseCategory: event.target.expenseCategory.value
     };
     try{
-        let response = await axios.post("http://localhost:3000/expense/add-expense", obj)
-        showNewExpenseOnScreen(response.data.newExpenseDetail)
+        const token = localStorage.getItem('token');
+        let response = await axios.post("http://localhost:3000/expense/add-expense", obj, {headers: {"Authorization": token}})
+        showNewExpenseOnScreen(response.data.expense)
     } catch(err) {
         document.body.innerHTML += "<h4> Something went wrong </h4>"
         console.log(err)
@@ -16,10 +17,11 @@ const registerExpense = async(event) => {
 
 const display = async(event) => {
     try{
-        let response = await axios.get("http://localhost:3000/expense/get-expense")
-        for(var i=0; i<response.data.allExpense.length; i++) {
-            await showNewExpenseOnScreen(response.data.allExpense[i])
-        }
+        const token = localStorage.getItem('token');
+        let response = await axios.get("http://localhost:3000/expense/get-expense", {headers: {"Authorization": token}})
+        response.data.expenses.forEach(expense => {
+            showNewExpenseOnScreen(expense);
+        })
     } catch(err) {
         console.log(err)
     }
@@ -39,14 +41,15 @@ const showNewExpenseOnScreen = (expense) => {
 
 const deleteExpense = async (expenseId) => {
     try{
-        let response = await axios.delete(`http://localhost:3000/expense/delete-expense/${expenseId}`)
-        await removeExpenseFromScreen(expenseId);
+        const token = localStorage.getItem('token');
+        await axios.delete(`http://localhost:3000/expense/delete-expense/${expenseId}`, {headers: {"Authorization": token}})
+        removeExpenseFromScreen(expenseId);
     } catch(err) {
         console.log(err);
     }
 }
 
-const removeExpenseFromScreen = async (expenseId) => {
+const removeExpenseFromScreen = (expenseId) => {
     const parentNode = document.getElementById('listOfExpenses');
     const elem = document.getElementById(expenseId);
     parentNode.removeChild(elem);

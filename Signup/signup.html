@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign up</title>
+        <style>
+            html,body {
+                background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzhpEZa4bIQZNjoaug16e3KuhEayHUawmJeg&usqp=CAU");
+                background-size: 100% 100%;
+                background-size: cover;
+            }
+            form, ul {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+
+        <form onsubmit="registerUser(event)" id="listOfItem">
+            <label>Enter name:</label>
+            <input type="text" id="name" name="name" required><br>
+            <label>Enter email:</label>
+            <input type="email" id="email" name="email" required><br>
+            <label>Enter password:</label>
+            <input type="password" id="password" name="password" required><br>
+            <button type="submit">Sign Up</button>
+        </form>
+        <ul id="listOfUsers"></ul>
+        <a href = '../Login/login.html'>Existing User - Login</a>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+        <script src="./signup.js"></script>
+    </body>
+</html>
