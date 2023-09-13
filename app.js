@@ -8,21 +8,30 @@ var cors = require('cors');
 const app = express();
 app.use(cors());
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 app.use(express.json());
 
 const sequelize = require('./util/database');
 const User = require('./models/user');
 const Expense = require('./models/expense');
+const Order = require('./models/order');
 
 const userRoutes = require('./routes/user');
 const expenseRoutes = require('./routes/expense');
+const purchaseRoutes = require('./routes/purchase');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/user', userRoutes);
 app.use('/expense', expenseRoutes);
+app.use('/purchase', purchaseRoutes);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
+
+User.hasMany(Order);
+Order.belongsTo(User);
 
 sequelize
   .sync()
