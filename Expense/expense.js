@@ -94,7 +94,7 @@ function showLeaderboard() {
         var leaderboardElem = document.getElementById('leaderboard');
         leaderboardElem.innerHTML += '<h1>Leaderboard</h1>'
         userLeaderboard.data.forEach((userDetails) => {
-            leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.total_cost || 0}</li>`
+            leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.totalExpenses || 0}</li>`
         })
     }
     document.getElementById('message').appendChild(inputElement);
@@ -110,7 +110,7 @@ document.getElementById('rzp-button1').onclick = async function (event) {
         "key": response.data.key_id,
         "order_id": response.data.order.id,
         "handler": async function (response) {
-            await axios.post("http://localhost:3000/purchase/updatetransactionstatus",{
+            const res = await axios.post("http://localhost:3000/purchase/updatetransactionstatus",{
                 order_id: options.order_id,
                 payment_id: response.razorpay_payment_id
             }, {headers: {"Authorization": token}})

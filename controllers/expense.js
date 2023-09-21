@@ -1,7 +1,5 @@
-const express = require('express');
-const router = express.Router();
-
 const Expense = require('../models/expense');
+const User = require('../models/user');
 
 function isstringinvalid(string){
     if(string == undefined || string.length === 0){
@@ -14,11 +12,14 @@ function isstringinvalid(string){
 const addExpense = async (req, res) => {
     try{
         const { expenseAmount, expenseDesc, expenseCategory } = req.body;
-        if(isstringinvalid(expenseAmount) || isstringinvalid(expenseDesc) || isstringinvalid(expenseCategory)){
+        if(isstringinvalid(expenseAmount)){
             return res.status(400).json({ success: false, message: 'Parameters missing' })
         }
-        const expense = await Expense.create({ expenseAmount, expenseDesc, expenseCategory, userId: req.user.id });
-        res.status(201).json({ expense, success:true });
+        const expense = await Expense.create({ expenseAmount, expenseDesc, expenseCategory, userId: req.user.id })
+        const totalExpense = Number(req.user.totalExpenses) + Number(expenseAmount);
+        User.update({totalExpenses: totalExpense}, {where: {id: req.user.id}})
+
+        res.status(201).json({ expense: expense });
     }catch(err) {
         res.status(500).json({succes: false, error: err});
     }

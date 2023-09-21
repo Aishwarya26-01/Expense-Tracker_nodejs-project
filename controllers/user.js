@@ -30,7 +30,7 @@ const addUser = async (req, res) => {
     }
 }
 
-function generateAccessToken(id, ispremiumuser){
+const generateAccessToken = (id, ispremiumuser) => {
     return jwt.sign({userId: id, ispremiumuser}, 'secretkey');
 }
 
@@ -63,5 +63,6 @@ const loginUser = async (req, res) => {
 
 module.exports = {
     addUser,
-    loginUser
+    loginUser,
+    generateAccessToken
 }
