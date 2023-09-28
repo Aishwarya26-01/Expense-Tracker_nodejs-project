@@ -1,0 +1,20 @@
+body {
+    background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0js5ErwKLtwb7reGbF2yRBo0UZxcqjs3B4A&usqp=CAU");
+    background-size: 100% 100%;
+    background-size: cover;
+    text-align: center;
+}
+.container {
+    width: 18%;
+    background-color:rgb(238, 196, 255);
+    padding: 70px;
+    border-radius: 5px;
+    position: absolute;
+    top: 20%;
+    left: 37%;
+}
+button:hover {
+    background-color: rgb(182, 0, 182);
+    color: white;
+    cursor: pointer;
+}
