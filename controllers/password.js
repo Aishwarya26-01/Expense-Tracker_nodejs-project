@@ -1,6 +1,9 @@
+const uuid = require('uuid');
 const Sib = require('sib-api-v3-sdk');
+const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
+const Password = require('../models/password');
 
 require('dotenv').config();
 
@@ -8,6 +11,9 @@ const forgotPassword = async (req, res, next) => {
     try {
         const {email} = req.body;
         const user = await User.findOne({where: {email} });
+        const id = uuid.v4();
+        console.log(user);
+        console.log(email);
         
         const client = Sib.ApiClient.instance
         const apiKey = client.authentications['api-key'];
@@ -16,7 +22,7 @@ const forgotPassword = async (req, res, next) => {
 
         const sender = {
             email: 'aishumishra1999@gmail.com',
-            name: 'Unique Factory'
+            name: 'Unique Facory'
         }
 
         const recievers = [
@@ -31,7 +37,7 @@ const forgotPassword = async (req, res, next) => {
             subject: 'Reset Password',
             textContent: `Follow the link and reset the password`,
             htmlContent: `<h3>Click on the link below to reset the password</h3><br>
-                <a href="http://localhost:3000/password/resetpassword/">Reset your Password</a>`
+                <a href="http://localhost:3000/password/resetpassword/${id}">Reset your Password</a>`
         })
         return res.status(201).json({success: true, message:"Reset password mail sent successfully"});
     }
@@ -41,6 +47,67 @@ const forgotPassword = async (req, res, next) => {
     }
 }
 
+const resetPassword = async(req, res) => {
+    try {
+        const id = req.params.id;
+        const forgotpasswordrequest = await Password.findOne({where: {id}})
+        if(forgotpasswordrequest) {
+            forgotpasswordrequest.update({isactive: false});
+            res.status(200).send(`<html>
+                                    <script>
+                                        function resetform(e) {
+                                            e.preventDefault();
+                                            console.log('called');
+                                        }
+                                    </script>
+                                    <form action="/password/updatepassword/${id}" method="get">
+                                        <label>Enter New Password</label>
+                                        <input name="newpassword" type="password" required></input>
+                                        <button>Reset Password</button>
+                                    </form>
+                                </html>`)
+            res.end()
+        }
+    } catch(err) {
+        console.log(err);
+        return res.status(500).json({success: false, error: err});
+    }
+}
+
+const updatePassword = async(req, res) => {
+    try{
+        const{newpassword} = req.query;
+        const{resetpasswordid} = req.params;
+        const resetpasswordrequest = await Password.findOne({where: {id:resetpasswordid}});
+        const user = await User.findOne({where: {id:resetpasswordrequest.userId}})
+        console.log('userDetails', user);
+        if(user) {
+            const saltRounds = 10;
+            bcrypt.genSalt(saltRounds, function(err, salt) {
+                if(err) {
+                    console.log(err);
+                    throw new Error(err);
+                }
+                bcrypt.hash(newpassword, salt, function(err, hash) {
+                    if(err) {
+                        console.log(err);
+                        throw new Error(err);
+                    }
+                    user.update({password: hash}).then(() => {
+                        res.status(201).json({message: 'New password updated successfully'});
+                    })
+                })
+            })
+        } else {
+            return res.status(404).json({error: 'No user exists', success: false});
+        }
+    } catch(err) {
+        return res.status(403).json({success: false, error: err});
+    }
+}
+
 module.exports = {
-    forgotPassword
+    forgotPassword,
+    resetPassword,
+    updatePassword
 }
