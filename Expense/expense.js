@@ -1,3 +1,4 @@
+const token = localStorage.getItem('token');
 const registerExpense = async(event) => {
     event.preventDefault();
     const expenseDetails = {
@@ -6,7 +7,6 @@ const registerExpense = async(event) => {
         expenseCategory: event.target.expenseCategory.value
     };
     try{
-        const token = localStorage.getItem('token');
         let response = await axios.post("http://localhost:3000/expense/add-expense", expenseDetails, {headers: {"Authorization": token}})
         showNewExpenseOnScreen(response.data.expense)
     } catch(err) {
@@ -33,7 +33,6 @@ function parseJwt(token) {
 
 const display = async(event) => {
     try{
-        const token = localStorage.getItem('token');
         const decodeToken = parseJwt(token);
         console.log(decodeToken);
         const ispremiumuser = decodeToken.ispremiumuser;
@@ -66,7 +65,6 @@ const showNewExpenseOnScreen = (expense) => {
 
 const deleteExpense = async (expenseId) => {
     try{
-        const token = localStorage.getItem('token');
         await axios.delete(`http://localhost:3000/expense/delete-expense/${expenseId}`, {headers: {"Authorization": token}})
         removeExpenseFromScreen(expenseId);
     } catch(err) {
@@ -86,7 +84,6 @@ function showLeaderboard() {
     inputElement.value = 'Show Leaderboard';
 
     inputElement.onclick = async() => {
-        const token = localStorage.getItem('token');
         console.log(token);
         const userLeaderboard = await axios.get("http://localhost:3000/premium/showLeaderBoard", {headers: {"Authorization": token}})
         console.log(userLeaderboard);
@@ -104,11 +101,11 @@ window.addEventListener("DOMContentLoaded", display);
 
 async function download() {
     try{
-        const response = await axios.get("http://localhost:3000/user/download", {headers: {"Authorization": token}})
-        if(response.status === 201) {
+        const response = await axios.get("http://localhost:3000/expense/download", {headers: {"Authorization": token}})
+        if(response.status === 200) {
             var a = document.createElement("a");
-            a.href = response.data.fileUrl;
-            a.download = myexpense.csv;
+            a.href = response.data.fileURL;
+            a.download = 'MyExpense.csv';
             a.click();
         } else {
             throw new Error(response.data.message);
@@ -119,7 +116,6 @@ async function download() {
 }
 
 document.getElementById('rzp-button1').onclick = async function (event) {
-    const token = localStorage.getItem('token');
     const response = await axios.get("http://localhost:3000/purchase/premiummembership", {headers: {"Authorization": token}})
     //console.log(response);
     var options = {

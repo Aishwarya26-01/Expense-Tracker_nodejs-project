@@ -18,6 +18,7 @@ const User = require('./models/user');
 const Expense = require('./models/expense');
 const Order = require('./models/order');
 const Password = require('./models/password');
+const DownloadFile = require('./models/downloadFile');
 
 const userRoutes = require('./routes/user');
 const expenseRoutes = require('./routes/expense');

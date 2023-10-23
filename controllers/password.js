@@ -47,60 +47,60 @@ const forgotPassword = async (req, res, next) => {
     }
 }
 
-const resetPassword = async(req, res) => {
-    try {
-        const id = req.params.id;
-        const forgotpasswordrequest = await Password.findOne({where: {id}})
+const resetPassword = (req, res) => {
+    const id = req.params.id;
+    Password.findOne({where: {id}}).then((forgotpasswordrequest) => {
         if(forgotpasswordrequest) {
             forgotpasswordrequest.update({isactive: false});
             res.status(200).send(`<html>
                                     <script>
-                                        function resetform(e) {
+                                        function formsubmitted(e){
                                             e.preventDefault();
-                                            console.log('called');
+                                            console.log('called')
                                         }
                                     </script>
+
                                     <form action="/password/updatepassword/${id}" method="get">
-                                        <label>Enter New Password</label>
+                                        <label for="newpassword">Enter New password</label>
                                         <input name="newpassword" type="password" required></input>
-                                        <button>Reset Password</button>
+                                        <button>reset password</button>
                                     </form>
-                                </html>`)
+                                </html>`
+                                )
             res.end()
         }
-    } catch(err) {
-        console.log(err);
-        return res.status(500).json({success: false, error: err});
-    }
+    })
 }
 
-const updatePassword = async(req, res) => {
+const updatePassword = (req, res) => {
     try{
         const{newpassword} = req.query;
         const{resetpasswordid} = req.params;
-        const resetpasswordrequest = await Password.findOne({where: {id:resetpasswordid}});
-        const user = await User.findOne({where: {id:resetpasswordrequest.userId}})
-        console.log('userDetails', user);
-        if(user) {
-            const saltRounds = 10;
-            bcrypt.genSalt(saltRounds, function(err, salt) {
-                if(err) {
-                    console.log(err);
-                    throw new Error(err);
-                }
-                bcrypt.hash(newpassword, salt, function(err, hash) {
-                    if(err) {
-                        console.log(err);
-                        throw new Error(err);
-                    }
-                    user.update({password: hash}).then(() => {
-                        res.status(201).json({message: 'New password updated successfully'});
+        Password.findOne({where: {id:resetpasswordid}}).then((resetpasswordrequest) => {
+            User.findOne({where: {id:resetpasswordrequest.userId}}).then((user) => {
+                console.log('userDetails', user);
+                if(user) {
+                    const saltRounds = 10;
+                    bcrypt.genSalt(saltRounds, function(err, salt) {
+                        if(err) {
+                            console.log(err);
+                            throw new Error(err);
+                        }
+                        bcrypt.hash(newpassword, salt, function(err, hash) {
+                            if(err) {
+                                console.log(err);
+                                throw new Error(err);
+                            }
+                            user.update({password: hash}).then(() => {
+                                res.status(201).json({message: 'New password updated successfully'});
+                            })
+                        })
                     })
-                })
+                } else {
+                    return res.status(404).json({error: 'No user exists', success: false});
+                }
             })
-        } else {
-            return res.status(404).json({error: 'No user exists', success: false});
-        }
+        })
     } catch(err) {
         return res.status(403).json({success: false, error: err});
     }

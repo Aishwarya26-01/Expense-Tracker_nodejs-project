@@ -1,12 +1,36 @@
 const Expense = require('../models/expense');
 const User = require('../models/user');
 const sequelize = require('../util/database');
+const AWS = require('aws-sdk');
+const UserServices = require('../services/userservices');
+const S3services = require('../services/S3services');
+const DownloadedFile = require('../models/downloadFile');
 
 function isstringinvalid(string){
     if(string == undefined || string.length === 0){
         return true
     } else {
         return false
+    }
+}
+
+const downloadexpense = async (req, res) => {
+    try {
+        const expenses = await UserServices.getExpenses(req);
+        console.log(expenses);
+        const stringifiedExpenses = JSON.stringify(expenses);
+        const userId = req.user.id;
+        const filename = `Expense${userId}/${new Date()}.txt`;
+        const fileURL = await S3services.uploadToS3(stringifiedExpenses, filename);
+
+        DownloadedFile.create({
+            url: fileURL,
+            userId: req.user.id
+        })
+        res.status(200).json({fileURL, success:true});
+    }catch(err){
+        console.log(err);
+        res.status(500).json({fileURL: '', success: false, err: err});
     }
 }
 
@@ -70,5 +94,6 @@ const deleteExpense = async (req, res) => {
 module.exports = {
     addExpense, 
     getExpense, 
-    deleteExpense
+    deleteExpense,
+    downloadexpense
 }
