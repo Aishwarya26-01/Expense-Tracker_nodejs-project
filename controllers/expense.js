@@ -57,15 +57,15 @@ const getExpense = async (req, res) => {
         const check = req.user.ispremiumuser;
         const page = +req.query.page || 1;
         const pageSize = +req.query.pageSize || 10;
-        let totalExpenses = req.user.countExpenses();
+        let totalExpenses = await req.user.countExpenses();
 
-        console.log('Aishwaryaaaa');
         const data = await UserServices.getexpenses(req, {
             offset: (page - 1)*pageSize,
             limit: pageSize,
             order: [['id', 'DESC']]
         })
         console.log(data);
+        console.log(page, pageSize, totalExpenses)
 
         res.status(200).json({
             allExpenses: data,

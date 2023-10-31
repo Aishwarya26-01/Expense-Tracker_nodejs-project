@@ -201,7 +201,7 @@ async function getExpenses(page){
     try {
         const pageSize = localStorage.getItem('pageSize')
     
-        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`,{headers:{"Authorisation":token}});
+        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`,{headers:{"Authorization":token}});
         console.log(res);
         console.log(res.data.allExpenses);
         listExpense(res.data.allExpenses)
