@@ -54,8 +54,29 @@ const addExpense = async (req, res) => {
 
 const getExpense = async (req, res) => {
     try{
-        const expenses = await Expense.findAll({ where: {userId: req.user.id} });
-        res.status(200).json({ expenses, success: true });
+        const check = req.user.ispremiumuser;
+        const page = +req.query.page || 1;
+        const pageSize = +req.query.pageSize || 10;
+        let totalExpenses = req.user.countExpenses();
+
+        console.log('Aishwaryaaaa');
+        const data = await UserServices.getexpenses(req, {
+            offset: (page - 1)*pageSize,
+            limit: pageSize,
+            order: [['id', 'DESC']]
+        })
+        console.log(data);
+
+        res.status(200).json({
+            allExpenses: data,
+            check,
+            currentPage: page,
+            hasNextPage: pageSize*page < totalExpenses,
+            nextPage: page + 1,
+            hasPreviousPage: page > 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalExpenses/pageSize)
+        })
     } catch(err) {
         console.log(err);
         return res.status(500).json({ error: err, success: false });

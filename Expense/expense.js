@@ -1,4 +1,5 @@
 const token = localStorage.getItem('token');
+
 const registerExpense = async(event) => {
     event.preventDefault();
     const expenseDetails = {
@@ -9,9 +10,12 @@ const registerExpense = async(event) => {
     try{
         let response = await axios.post("http://localhost:3000/expense/add-expense", expenseDetails, {headers: {"Authorization": token}})
         showNewExpenseOnScreen(response.data.expense)
+
+        document.getElementById("expenseAmount").value='';
+        document.getElementById("expenseDesc").value='';
+        document.getElementById("expenseCategory").value='';
     } catch(err) {
-        document.body.innerHTML += "<h4> Something went wrong </h4>"
-        console.log(err)
+        showError(err)
     }
 }
 
@@ -31,10 +35,12 @@ function parseJwt(token) {
     return JSON.parse(jsonPayLoad);
 }
 
-const display = async(event) => {
+window.addEventListener("DOMContentLoaded", async() => {
     try{
+        const token = localStorage.getItem('token');
+        const pageSize = localStorage.getItem('pageSize');
+        const page = 1;
         const decodeToken = parseJwt(token);
-        console.log(decodeToken);
         const ispremiumuser = decodeToken.ispremiumuser;
 
         if(ispremiumuser) {
@@ -42,19 +48,15 @@ const display = async(event) => {
             showLeaderboard();
         }
 
-        let response = await axios.get("http://localhost:3000/expense/get-expense", {headers: {"Authorization": token}})
-        response.data.expenses.forEach(expense => {
-            showNewExpenseOnScreen(expense);
-        })
+        let res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`, {headers: {"Authorization": token}})
+        listExpense(res.data.allExpenses)
+        showPagination(res.data)
     } catch(err) {
-        console.log(err)
+        showError(err)
     }
-}
+})
 
 const showNewExpenseOnScreen = (expense) => {
-    document.getElementById("expenseAmount").value='';
-    document.getElementById("expenseDesc").value='';
-    document.getElementById("expenseCategory").value='';
 
     const parentNode = document.getElementById('listOfExpenses');
     const createNewExpense = `<li id='${expense.id}'>${expense.expenseAmount} - ${expense.expenseDesc} - ${expense.expenseCategory}
@@ -68,7 +70,7 @@ const deleteExpense = async (expenseId) => {
         await axios.delete(`http://localhost:3000/expense/delete-expense/${expenseId}`, {headers: {"Authorization": token}})
         removeExpenseFromScreen(expenseId);
     } catch(err) {
-        console.log(err);
+        showError(err)
     }
 }
 
@@ -76,6 +78,10 @@ const removeExpenseFromScreen = (expenseId) => {
     const parentNode = document.getElementById('listOfExpenses');
     const elem = document.getElementById(expenseId);
     parentNode.removeChild(elem);
+}
+
+function showError(err){
+    document.body.innerHTML += `<div style="color:red;">${err}</div>`
 }
 
 function showLeaderboard() {
@@ -97,8 +103,6 @@ function showLeaderboard() {
     document.getElementById('message').appendChild(inputElement);
 }
 
-window.addEventListener("DOMContentLoaded", display);
-
 async function download() {
     try{
         const response = await axios.get("http://localhost:3000/expense/download", {headers: {"Authorization": token}})
@@ -111,7 +115,7 @@ async function download() {
             throw new Error(response.data.message);
         }
     } catch(err) {
-        console.log(err);
+        showError(err);
     }
 }
 
@@ -143,4 +147,81 @@ document.getElementById('rzp-button1').onclick = async function (event) {
         console.log(response);
         alert('Something went wrong');
     });
+}
+
+async function pageSize(val){
+    try {
+        localStorage.setItem('pageSize',val);
+        const page=1
+        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${val}`,{headers:{"Authorization":token}});
+        console.log('success');
+        console.log(res);
+        console.log(res.data.allExpenses);
+        listExpense(res.data.allExpenses)
+        showPagination(res.data);
+    } catch (err) {
+        showError(err);
+    }
+}
+
+async function showPagination({currentPage,hasNextPage,nextPage,hasPreviousPage,previousPage,lastPage}){
+    try{
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = ''
+        if(hasPreviousPage){
+            const btn2 = document.createElement('button')
+            btn2.innerHTML = previousPage
+            btn2.addEventListener('click', ()=>getExpenses(previousPage))
+            pagination.appendChild(btn2)
+        }
+        const btn1 = document.createElement('button')
+        btn1.innerHTML = currentPage
+        btn1.addEventListener('click',()=>getExpenses(currentPage))
+        pagination.appendChild(btn1)
+
+        if (hasNextPage){
+            const btn3 = document.createElement('button')
+            btn3.innerHTML = nextPage
+            btn3.addEventListener('click',()=>getExpenses(nextPage))
+            pagination.appendChild(btn3)
+        }
+        if (currentPage!==1){
+            const btn4 = document.createElement('button')
+            btn4.innerHTML = 'main-page'
+            btn4.addEventListener('click',()=>getExpenses(1))
+            pagination.appendChild(btn4)
+        }
+    }
+    catch(err){
+        showError(err)
+    }
+}
+
+async function getExpenses(page){
+    try {
+        const pageSize = localStorage.getItem('pageSize')
+    
+        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`,{headers:{"Authorisation":token}});
+        console.log(res);
+        console.log(res.data.allExpenses);
+        listExpense(res.data.allExpenses)
+        showPagination(res.data);
+    } catch (err) {
+        showError(err);
+    }
+}
+
+async function listExpense(data){
+    try {
+        const parentNode=document.getElementById('listOfExpenses');
+        ///clear the existing expense 
+        parentNode.innerHTML='';
+        console.log(data);
+
+        for(i in data){
+            showNewExpenseOnScreen(data[i])
+        }
+    } catch (err) {
+        showError(err)
+    }
 }
