@@ -1,0 +1,2 @@
+::1 - - [02/Nov/2023:13:14:06 +0000] "GET /expense/get-expense?page=1&pageSize=10 HTTP/1.1" 200 1197 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+::1 - - [02/Nov/2023:13:16:04 +0000] "GET /expense/get-expense?page=1&pageSize=5 HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
