@@ -8,7 +8,7 @@ const registerExpense = async(event) => {
         expenseCategory: event.target.expenseCategory.value
     };
     try{
-        let response = await axios.post("http://localhost:3000/expense/add-expense", expenseDetails, {headers: {"Authorization": token}})
+        let response = await axios.post("http://65.2.6.8:3000/expense/add-expense", expenseDetails, {headers: {"Authorization": token}})
         showNewExpenseOnScreen(response.data.expense)
 
         document.getElementById("expenseAmount").value='';
@@ -48,7 +48,7 @@ window.addEventListener("DOMContentLoaded", async() => {
             showLeaderboard();
         }
 
-        let res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`, {headers: {"Authorization": token}})
+        let res = await axios.get(`http://65.2.6.8:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`, {headers: {"Authorization": token}})
         listExpense(res.data.allExpenses)
         showPagination(res.data)
     } catch(err) {
@@ -67,7 +67,7 @@ const showNewExpenseOnScreen = (expense) => {
 
 const deleteExpense = async (expenseId) => {
     try{
-        await axios.delete(`http://localhost:3000/expense/delete-expense/${expenseId}`, {headers: {"Authorization": token}})
+        await axios.delete(`http://65.2.6.8:3000/expense/delete-expense/${expenseId}`, {headers: {"Authorization": token}})
         removeExpenseFromScreen(expenseId);
     } catch(err) {
         showError(err)
@@ -91,7 +91,7 @@ function showLeaderboard() {
 
     inputElement.onclick = async() => {
         console.log(token);
-        const userLeaderboard = await axios.get("http://localhost:3000/premium/showLeaderBoard", {headers: {"Authorization": token}})
+        const userLeaderboard = await axios.get("http://65.2.6.8:3000/premium/showLeaderBoard", {headers: {"Authorization": token}})
         console.log(userLeaderboard);
 
         var leaderboardElem = document.getElementById('leaderboard');
@@ -105,7 +105,7 @@ function showLeaderboard() {
 
 async function download() {
     try{
-        const response = await axios.get("http://localhost:3000/expense/download", {headers: {"Authorization": token}})
+        const response = await axios.get("http://65.2.6.8:3000/expense/download", {headers: {"Authorization": token}})
         if(response.status === 200) {
             var a = document.createElement("a");
             a.href = response.data.fileURL;
@@ -120,13 +120,13 @@ async function download() {
 }
 
 document.getElementById('rzp-button1').onclick = async function (event) {
-    const response = await axios.get("http://localhost:3000/purchase/premiummembership", {headers: {"Authorization": token}})
+    const response = await axios.get("http://65.2.6.8t:3000/purchase/premiummembership", {headers: {"Authorization": token}})
     //console.log(response);
     var options = {
         "key": response.data.key_id,
         "order_id": response.data.order.id,
         "handler": async function (response) {
-            const res = await axios.post("http://localhost:3000/purchase/updatetransactionstatus",{
+            const res = await axios.post("http://65.2.6.8:3000/purchase/updatetransactionstatus",{
                 order_id: options.order_id,
                 payment_id: response.razorpay_payment_id
             }, {headers: {"Authorization": token}})
@@ -153,7 +153,7 @@ async function pageSize(val){
     try {
         localStorage.setItem('pageSize',val);
         const page=1
-        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${val}`,{headers:{"Authorization":token}});
+        const res = await axios.get(`http://65.2.6.8:3000/expense/get-expense?page=${page}&pageSize=${val}`,{headers:{"Authorization":token}});
         console.log('success');
         console.log(res);
         console.log(res.data.allExpenses);
@@ -201,7 +201,7 @@ async function getExpenses(page){
     try {
         const pageSize = localStorage.getItem('pageSize')
     
-        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`,{headers:{"Authorization":token}});
+        const res = await axios.get(`http://65.2.6.8:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`,{headers:{"Authorization":token}});
         console.log(res);
         console.log(res.data.allExpenses);
         listExpense(res.data.allExpenses)

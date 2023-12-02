@@ -4,7 +4,7 @@ const forgotPassword = async(event) => {
         const userDetails = {email: event.target.email.value};
         console.log(userDetails);
 
-        let response = await axios.post("http://localhost:3000/password/forgotpassword", userDetails);
+        let response = await axios.post("http://65.2.6.8:3000/password/forgotpassword", userDetails);
         if(response.status === 201) {
             document.body.innerHTML += '<div style="color:darkgreen; font-size:30px; font-weight:bold">Mail sent successfully</div>';
         } else {

@@ -7,7 +7,7 @@ async function loginUser(event) {
     
         const obj = { email, password }
         console.log(obj);
-        const response = await axios.post("http://localhost:3000/user/login", obj)
+        const response = await axios.post("http://65.2.6.8:3000/user/login", obj)
             if(response.status === 200) {
                 alert(response.data.message)
                 localStorage.setItem('token', response.data.token)

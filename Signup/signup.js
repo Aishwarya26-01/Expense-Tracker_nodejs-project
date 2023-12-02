@@ -12,7 +12,7 @@ async function registerUser(event) {
             password
         }
         console.log(obj);
-        const response = await axios.post("http://localhost:3000/user/signup", obj)
+        const response = await axios.post("http://65.2.6.8:3000/user/signup", obj)
             if(response.status === 201) {
                 window.location.href = "../Login/login.html"
             } else {
